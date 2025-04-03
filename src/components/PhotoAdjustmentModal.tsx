@@ -1,28 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Square, Circle, Triangle, Hexagon, Star, ZoomIn, ZoomOut, Download, Smile, Trash2 } from 'lucide-react';
-
-interface PhotoAdjustmentModalProps {
-  file: File;
-  onClose: () => void;
-  onComplete: (url: string, shape: string, stickers: Array<{ emoji: string; x: number; y: number; scale: number }>) => void;
-}
+import { PhotoAdjustmentModalProps, Shape } from '../types';
 
 const SHAPES = [
-  { id: 'square', icon: Square, name: 'Square' },
-  { id: 'circle', icon: Circle, name: 'Circle' },
-  { id: 'triangle', icon: Triangle, name: 'Triangle' },
-  { id: 'hexagon', icon: Hexagon, name: 'Hexagon' },
-  { id: 'star', icon: Star, name: 'Star' },
+  { id: 'square' as Shape, icon: Square, name: 'Square' },
+  { id: 'circle' as Shape, icon: Circle, name: 'Circle' },
+  { id: 'triangle' as Shape, icon: Triangle, name: 'Triangle' },
+  { id: 'hexagon' as Shape, icon: Hexagon, name: 'Hexagon' },
+  { id: 'star' as Shape, icon: Star, name: 'Star' },
 ];
 
 const STICKERS = ['😊', '😍', '🥰', '😎', '🤩', '😇', '😋', '😌', '😉', '😜', '😝', '😛', '🤗', '🤔', '🤭', '🤫'];
+
+const drawStar = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, size: number) => {
+  const spikes = 5;
+  const outerRadius = size;
+  const innerRadius = size * 0.4;
+
+  let rot = Math.PI / 2 * 3;
+  let x = centerX;
+  let y = centerY;
+  const step = Math.PI / spikes;
+
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY - outerRadius);
+
+  for (let i = 0; i < spikes; i++) {
+    x = centerX + Math.cos(rot) * outerRadius;
+    y = centerY + Math.sin(rot) * outerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+
+    x = centerX + Math.cos(rot) * innerRadius;
+    y = centerY + Math.sin(rot) * innerRadius;
+    ctx.lineTo(x, y);
+    rot += step;
+  }
+
+  ctx.lineTo(centerX, centerY - outerRadius);
+  ctx.closePath();
+}
 
 export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
   file,
   onClose,
   onComplete,
 }) => {
-  const [selectedShape, setSelectedShape] = useState('square');
+  const [selectedShape, setSelectedShape] = useState<Shape>('square');
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -164,14 +188,7 @@ export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
         ctx.closePath();
         break;
       case 'star':
-        for (let i = 0; i < 5; i++) {
-          const angle = (i * Math.PI * 2) / 5;
-          const x = centerX + size * Math.cos(angle);
-          const y = centerY + size * Math.sin(angle);
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
+        drawStar(ctx, centerX, centerY, size);
         break;
       default: // square
         ctx.rect(centerX - size, centerY - size, size * 2, size * 2);
@@ -203,7 +220,11 @@ export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
     canvas.toBlob((blob) => {
       if (blob) {
         const url = URL.createObjectURL(blob);
-        onComplete(url, selectedShape, stickers.map(({ emoji, x, y, scale }) => ({ emoji, x, y, scale })));
+        onComplete(
+          url,
+          selectedShape,
+          stickers.map(({ id, emoji, x, y, scale }) => ({ id, emoji, x, y, scale }))
+        );
       }
     }, 'image/png');
   };

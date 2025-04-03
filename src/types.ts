@@ -4,6 +4,8 @@ export interface Photo {
   id: string;
   url: string;
   shape: Shape;
+  scale: number;
+  position: { x: number; y: number };
   stickers: Array<{
     id: string;
     emoji: string;
@@ -13,30 +15,29 @@ export interface Photo {
   }>;
 }
 
-export interface Page {
-  id: string;
-  photos: Photo[];
-  stickers: Sticker[];
-}
-
 export interface Sticker {
   id: string;
-  type: string;
+  emoji: string;
   x: number;
   y: number;
   scale: number;
-  rotation: number;
 }
 
 export interface PhotoAdjustmentModalProps {
   file: File;
   onClose: () => void;
-  onComplete: (url: string, shape: Shape, stickers: Array<{ emoji: string; x: number; y: number; scale: number }>) => void;
+  onComplete: (url: string, shape: Shape, stickers: Array<Sticker>) => void;
 }
 
 export interface ImageSize {
   width: number;
   height: number;
+}
+
+export interface Page {
+  id: string;
+  photos: Photo[];
+  stickers: Sticker[];
 }
 
 export interface AlbumState {
