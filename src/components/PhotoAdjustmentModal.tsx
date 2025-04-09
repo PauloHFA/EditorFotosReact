@@ -54,6 +54,7 @@ export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
   const [stickers, setStickers] = useState<Array<{ id: string; emoji: string; x: number; y: number; scale: number }>>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
   const [showStickers, setShowStickers] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -223,8 +224,14 @@ export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
         onComplete(
           url,
           selectedShape,
-          stickers.map(({ id, emoji, x, y, scale }) => ({ id, emoji, x, y, scale }))
+          stickers.map(({ id, emoji, x, y, scale }) => ({ 
+            id, 
+            emoji, 
+            position: { x, y },
+            scale 
+          }))
         );
+        setIsSaved(true);
       }
     }, 'image/png');
   };
@@ -363,7 +370,7 @@ export const PhotoAdjustmentModal: React.FC<PhotoAdjustmentModalProps> = ({
               className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
             >
               <Download className="w-5 h-5" />
-              <span>Download</span>
+              <span>{isSaved ? 'Download' : 'Salvar Edição'}</span>
             </button>
           </div>
 
