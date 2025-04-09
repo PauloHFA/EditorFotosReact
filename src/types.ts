@@ -1,16 +1,21 @@
 export type Shape = 'square' | 'circle' | 'triangle' | 'hexagon' | 'star';
 
+export interface Position {
+  x: number;
+  y: number;
+}
+
 export interface Photo {
   id: string;
   url: string;
   shape: Shape;
   scale: number;
-  position: { x: number; y: number };
+  position: Position;
+  imagePosition: Position;
   stickers: Array<{
     id: string;
     emoji: string;
-    x: number;
-    y: number;
+    position: Position;
     scale: number;
   }>;
 }
@@ -18,8 +23,7 @@ export interface Photo {
 export interface Sticker {
   id: string;
   emoji: string;
-  x: number;
-  y: number;
+  position: Position;
   scale: number;
 }
 
@@ -45,7 +49,7 @@ export interface AlbumState {
   currentPage: Page | null;
   updatePhotoPosition: (photoId: string, x: number, y: number) => void;
   updateStickerPosition: (stickerId: string, x: number, y: number) => void;
-  updatePhotoImagePosition: (pageId: string, photoId: string, position: { x: number; y: number }) => void;
+  updatePhotoImagePosition: (pageId: string, photoId: string, position: Position) => void;
   updatePhotoScale: (pageId: string, photoId: string, scale: number) => void;
   setPages: (pages: Page[]) => void;
   setCurrentPage: (pageId: string) => void;
